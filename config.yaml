@@ -1,0 +1,80 @@
+# Healthcare AI Configuration - Chest X-ray Pneumonia Detection
+project:
+  name: "chest_xray_pneumonia_detection"
+  version: "1.0.0"
+  description: "Deep learning model for pneumonia detection in chest X-rays"
+
+task:
+  type: "classification"
+  domain: "healthcare"
+  modality: "medical_imaging"
+  objective: "Classify chest X-rays as Normal, Bacterial Pneumonia, or Viral Pneumonia"
+  
+data:
+  dataset_name: "NIH Chest X-ray Dataset"
+  data_dir: "data"
+  image_size: [512, 512]
+  channels: 1  # Grayscale
+  num_classes: 3
+  class_names: ["Normal", "Bacterial_Pneumonia", "Viral_Pneumonia"]
+  
+  # Data split ratios
+  train_split: 0.7
+  val_split: 0.15
+  test_split: 0.15
+  
+  # Data augmentation
+  augmentation:
+    enabled: true
+    rotation_range: 15
+    width_shift_range: 0.1
+    height_shift_range: 0.1
+    horizontal_flip: true
+    zoom_range: 0.1
+    brightness_range: [0.8, 1.2]
+
+model:
+  architecture: "resnet50"
+  pretrained: true
+  freeze_backbone: false
+  dropout_rate: 0.5
+  activation: "relu"
+  final_activation: "softmax"
+
+training:
+  batch_size: 32
+  epochs: 50
+  learning_rate: 0.001
+  optimizer: "adam"
+  loss_function: "categorical_crossentropy"
+  early_stopping:
+    enabled: true
+    patience: 10
+    monitor: "val_loss"
+  
+  # Learning rate scheduling
+  lr_scheduler:
+    enabled: true
+    type: "reduce_on_plateau"
+    factor: 0.5
+    patience: 5
+    min_lr: 0.00001
+
+evaluation:
+  metrics: ["accuracy", "precision", "recall", "f1_score", "auc"]
+  confusion_matrix: true
+  classification_report: true
+
+inference:
+  confidence_threshold: 0.7
+  output_probabilities: true
+
+logging:
+  level: "INFO"
+  log_dir: "logs"
+  tensorboard: true
+
+hardware:
+  device: "auto"  # auto, cpu, cuda
+  mixed_precision: true
+  num_workers: 4
